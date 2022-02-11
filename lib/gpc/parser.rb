@@ -9,7 +9,7 @@ module Gpc
   class Parser
 
     HEADER_SECTIONS = { type: 3, account: 16, identifier: 20, old_balance_date: 6, old_balance: 14, old_balance_sign: 1, new_balance: 14, new_balance_sign: 1, debit_turnover: 14, debit_turnover_sign: 1, credit_turnover: 14, credit_turnover_sign: 1, number: 3, date: 6, filler: 14 }
-    TRANSACTION_SECTIONS = { type: 3, account: 16, counterparty_account: 16, transaction_id: 13, amount: 12, accounting_code: 1, variable_symbol: 10, filler: 2, counterparty_bank_code: 4, constant_symbol: 4, specific_symbol: 10, date: 6, note: 20, change_code: 1, data_type: 4, due_date: 6 }
+    TRANSACTION_SECTIONS = { type: 3, account: 16, counterparty_account: 16, id: 13, amount: 12, accounting_code: 1, variable_symbol: 10, filler: 2, counterparty_bank_code: 4, constant_symbol: 4, specific_symbol: 10, date: 6, note: 20, change_code: 1, data_type: 4, due_date: 6 }
 
     def self.call(data)
       new(data).parse
@@ -33,13 +33,21 @@ module Gpc
             @statement = { transactions: [] }
           end
 
-          @statement.merge!(line.sections(HEADER_SECTIONS))
-          @statement[:account] = Gpc::BankAccount.parse(@statement[:account])
-          @statement[:identifier].strip!
-          @statement[:date] = date(@statement[:date])
+          sections = line.sections(HEADER_SECTIONS)
+          sections[:credit_turnover] = BigDecimal("#{sections.delete(:credit_turnover_sign)}#{sections[:credit_turnover]}") / 100
+          sections[:debit_turnover] = BigDecimal("#{sections.delete(:debit_turnover_sign)}#{sections[:debit_turnover]}") / 100
+          sections[:new_balance] = BigDecimal("#{sections.delete(:new_balance_sign)}#{sections[:new_balance]}") / 100
+          sections[:old_balance] = BigDecimal("#{sections.delete(:old_balance_sign)}#{sections[:old_balance]}") / 100
+          sections[:date] = date(sections[:date])
+          sections[:old_balance_date] = date(sections[:old_balance_date])
+          sections[:identifier].strip!
+          sections[:account] = Gpc::BankAccount.parse(sections[:account])
+
+          @statement.merge!(sections)
         when '075'
           transaction = line.sections(TRANSACTION_SECTIONS)
           transaction[:date] = date(transaction[:date])
+          transaction[:due_date] = date(transaction[:due_date])
           sign =
             case transaction[:accounting_code]
             when '1' then -1
@@ -61,9 +69,12 @@ module Gpc
           if transaction[:counterparty_account] != '' && transaction[:counterparty_bank_code] != ''
             [transaction[:counterparty_account], transaction[:counterparty_bank_code]].join('/')
           end
+          transaction[:note].strip!
+          transaction[:id] = transaction[:id].remove_leading_zeroes
 
           @statement[:transactions] << OpenStruct.new(transaction)
         else
+          # binding.pry
           fail Gpc::Error.new("Unknown line type #{type}")
         end
       end
