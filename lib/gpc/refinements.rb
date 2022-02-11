@@ -15,6 +15,10 @@ module Gpc
       def remove_leading_zeroes
         gsub(/\A0*/, '')
       end
+
+      def remove_leading_zeroes!
+        gsub!(/\A0*/, '')
+      end
     end
   end
 end
