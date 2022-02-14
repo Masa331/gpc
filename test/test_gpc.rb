@@ -59,7 +59,7 @@ class TestGpc < Minitest::Test
     data = File.read('./test/files/rb.gpc', encoding: 'Windows-1250:UTF-8')
     gpc = Gpc.parse(data)
 
-    assert gpc.size == 1
+    assert_equal 1, gpc.size
     assert_equal 1, gpc.first.transactions.size
     statement = gpc.first
 
@@ -82,5 +82,15 @@ class TestGpc < Minitest::Test
     assert_equal 'Částka: 590.5 CZK 19.01.2022', payment.av3
     assert_equal '', payment.av4
     assert_nil payment.counterparty
+  end
+
+  def test_komercni_banka_statement
+    data = File.read('./test/files/kb.gpc', encoding: 'Windows-1250:UTF-8')
+    gpc = Gpc.parse(data)
+
+    assert_equal 2, gpc.size
+
+    statement = gpc.first
+    assert_equal '35-2967671567', statement.account
   end
 end
