@@ -59,7 +59,7 @@ module Gpc
           transaction = line.sections(TRANSACTION_SECTIONS)
           transaction.delete(:type)
           transaction.delete(:filler)
-          transaction[:date] = date(transaction[:date])
+          transaction[:date] = date(transaction[:date], @statement[:date])
           transaction[:due_date] = date(transaction[:due_date])
           sign =
             case transaction[:accounting_code]
@@ -124,8 +124,12 @@ module Gpc
       @statements
     end
 
-    def date(string)
-      Date.strptime(string, '%d%m%y')
+    def date(string, default = nil)
+      if string == '000000'
+        default
+      else
+        Date.strptime(string, '%d%m%y')
+      end
     rescue Date::Error
     end
   end
