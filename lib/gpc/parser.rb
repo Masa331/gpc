@@ -71,6 +71,7 @@ module Gpc
 
           transaction[:amount] = BigDecimal(transaction[:amount]) / 100 * sign
           transaction[:account] = Gpc::BankAccount.parse(transaction[:account])
+          binding.pry
           transaction[:counterparty_account] = Gpc::BankAccount.parse(transaction[:counterparty_account])
           if transaction[:counterparty_bank_code] == '0000'
             transaction[:counterparty_bank_code] = ''

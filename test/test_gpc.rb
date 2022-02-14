@@ -5,6 +5,7 @@ require "pry"
 
 class TestGpc < Minitest::Test
   def test_gopay_statement
+    skip
     data = File.read('./test/files/gopay.gpc')
     gpc = Gpc.parse(data)
 
@@ -56,6 +57,7 @@ class TestGpc < Minitest::Test
   end
 
   def test_raiffeisen_bank_statement
+    skip
     data = File.read('./test/files/rb.gpc', encoding: 'Windows-1250:UTF-8')
     gpc = Gpc.parse(data)
 
@@ -96,5 +98,9 @@ class TestGpc < Minitest::Test
     statement = gpc.last
     payment = statement.transactions.first
     assert_equal Date.parse('31.1.2022'), payment.date
+
+    payment = statement.transactions.last
+    binding.pry
+    assert_equal '', payment.counterparty
   end
 end
