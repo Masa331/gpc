@@ -96,5 +96,8 @@ class TestGpc < Minitest::Test
     statement = gpc.last
     payment = statement.transactions.first
     assert_equal Date.parse('31.1.2022'), payment.date
+
+    payment = statement.transactions.last
+    assert_equal '55550309/0800', payment.counterparty
   end
 end
