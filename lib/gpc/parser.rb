@@ -33,6 +33,11 @@ module Gpc
 
         case type
         when '074'
+          if @transaction
+            @statement[:transactions] << Gpc::Transaction.new(@transaction)
+            @transaction = nil
+          end
+
           if @statement[:transactions].any? || @statement.keys.size > 1
             @statements << Gpc::Statement.new(@statement)
             @statement = { transactions: [] }

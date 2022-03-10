@@ -100,4 +100,19 @@ class TestGpc < Minitest::Test
     payment = statement.transactions.last
     assert_equal '55550309/0800', payment.counterparty
   end
+
+  def test_citfin_statement
+    data = File.read('./test/files/citfin.abo', encoding: 'Windows-1250:UTF-8')
+    gpc = Gpc.parse(data)
+
+    assert_equal 2, gpc.size
+
+    statement = gpc.first
+    assert_equal 5, statement.transactions.size
+
+    statement = gpc.last
+    assert_equal 1, statement.transactions.size
+    payment = statement.transactions.last
+    assert_equal 'Kakerian Fauderova -', payment.note
+  end
 end
