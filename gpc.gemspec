@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-require_relative 'lib/gpc'
-
 Gem::Specification.new do |spec|
   spec.name = "gpc"
-  spec.version = Gpc::VERSION
+  spec.version = '0.1.0'
   spec.authors = ["Premysl Donat"]
   spec.email = ["pdonat@seznam.cz"]
 
