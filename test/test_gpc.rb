@@ -60,7 +60,7 @@ class TestGpc < Minitest::Test
     gpc = Gpc.parse(data)
 
     assert_equal 1, gpc.size
-    assert_equal 1, gpc.first.transactions.size
+    assert_equal 2, gpc.first.transactions.size
     statement = gpc.first
 
     payment = statement.transactions.first
@@ -82,6 +82,10 @@ class TestGpc < Minitest::Test
     assert_equal 'Částka: 590.5 CZK 19.01.2022', payment.av3
     assert_equal '', payment.av4
     assert_nil payment.counterparty
+
+    # Test weird accounting codes
+    payment = statement.transactions.last
+    assert_equal BigDecimal('2379.4'), payment.amount
   end
 
   def test_komercni_banka_statement

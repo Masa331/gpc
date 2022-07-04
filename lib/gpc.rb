@@ -3,7 +3,7 @@
 require_relative 'gpc/parser'
 
 module Gpc
-  VERSION = "0.1.0"
+  VERSION = "0.1.1"
   class Error < StandardError; end
 
   def self.parse(data)

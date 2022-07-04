@@ -70,6 +70,8 @@ module Gpc
             case transaction[:accounting_code]
             when '1' then -1
             when '2' then 1
+            when '3' then -1
+            when '4' then 1
             else
               fail Gpc::Error.new("unknown accounting code: #{transaction[:accounting_code]}")
             end
